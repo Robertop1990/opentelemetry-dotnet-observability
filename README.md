@@ -37,7 +37,7 @@ The components used in this implementation are detailed below.
   **Function**: The otel-collector exposes port 4317 to configure the otlp receiver with the grpc protocol. The otlp receiver will receive logs, traces, and metrics from *WebObservabilityApplication*. The otel-collector exposes port 8889 so that prometheus can perform scraping and obtain metrics.
 
   ![Otel Collector Receiver](images/Otel-Collector-Receiver-4317.png)
-  <center><em>Configuring the otlp receiver with the grpc protocol.</em></center><br>
+  *Configuring the otlp receiver with the grpc protocol.*
 
   ### <u>WebObservabilityApplication</u>
   ![WebObservabilityApplication](images/WebObservabilityApplication.png)
@@ -58,17 +58,17 @@ The components used in this implementation are detailed below.
   **Function**: otel-collector will receive the logs from the *WebObservabilityApplication* send them to loki. In the otel-collector configuration file(otel-collector-config.yml) the loki exporter is defined, where the logs will be sent through the endpoint http://loki:3100/loki/api/v1/push.
 
   ![Loki Exporter](images/Loki-Exporter-Config.png)
-  <center><em>Configuring the loki exporter in otel-collector-config.yml.</em></center><br><br>
+  *Configuring the loki exporter in otel-collector-config.yml*
 
   An attribute is defined in processors, which allows additional tags to be inserted into those that are sent to loki.
   ![Loki Processors](images/Loki-Processors-Config.png)
   ![Loki Processors](images/Loki-Processors-Config-Class.png)
-  <center><em>Configuring the app_name attribute in otel-collector-config.yml.</em></center><br><br>
+  *Configuring the app_name attribute in otel-collector-config.yml*
 
   The pipeline for the logs is defined, where the receiver is the otlp(grpc://0.0.0.0:4317/v1/logs), the processors is the resourse and the exporter is loki. With this configuration, the otel-collector will send the logs to loki.
 
   ![Loki Pipelines](images/Loki-Pipelines-Config.png)
-  <center><em>Configuring the logs pipelines in otel-collector-config.yml.</em></center><br>
+  *Configuring the logs pipelines in otel-collector-config.yml*
 
   ### <u>jaeger</u>
   ![Loki](images/Jaeger.png)
@@ -77,18 +77,18 @@ The components used in this implementation are detailed below.
   **Function**: otel-collector will receive the traces from the *WebObservabilityApplication* send them to jaeger. In the otel-collector configuration file(otel-collector-config.yml) the otlp/jaeger exporter is defined, where traces will be sent through the jaeger:4317 endpoint, which is the through which jaeger receives traces in otlp format in grpc mode.
 
   ![Jaeger Exporter](images/Jaeger-Exporter.png)
-  <center><em>Configuring the jaeger exporter in otel-collector-config.yml.</em></center><br><br>
+  *Configuring the jaeger exporter in otel-collector-config.yml*
 
   The pipeline for traces is defined, where the receiver is otlp(grpc://0.0.0.0:4317/v1/traces), the processors is batch and the exporter is otlp/jaeger. With this configuration, otel-collector will send the traces to jaeger.
 
   ![Jaeger Pipelines](images/Jaeger-Pipelines-Config.png)
-  <center><em>Configuring the traces pipelines in otel-collector-config.yml.</em></center><br><br>
+  *Configuring the traces pipelines in otel-collector-config.yml*
 
   > [!NOTE]
   > The batch processor is responsible for batching traces before sending them. This configuration improves performance by reducing the number of requests send by the otel-collector.
   Jaeger also listens on port 4317 and receives these traces, thanks to the otel-collector sending them on its behalf.
   ![Jaeger Processors](images/Jaeger-Processors-Config.png)
-  <center><em>Configuring the batch processors in otel-collector-config.yml.</em></center><br>
+  *Configuring the batch processors in otel-collector-config.yml*
 
   ### <u>prometheus</u>
   ![Prometheus](images/Prometheus.png)
@@ -105,7 +105,7 @@ The components used in this implementation are detailed below.
   **enable_open_metrics (true)**: Allows metrics to be exposed in an advanced format that includes support for exemplars. **Exemplars** allow linking metrics(prometheus) with traces(jaeger), to delve deeper into an event.
 
   ![Prometheus Exporter](images/Prometheus-Exporter-Config.png)
-  <center><em>Configuring the prometheus exporter in otel-collector-config.yml.</em></center><br><br>
+  *Configuring the prometheus exporter in otel-collector-config.yml*
 
   In the prometheus configuration file(prometheus-config.yml), a scrape config is configured that defines how and when to collect metrics.
 
@@ -115,12 +115,12 @@ The components used in this implementation are detailed below.
   **job_name(otel-collector)**: Defines the otel-collector job to identify metrics coming from this source.  
   **static_configs (otel-collector:8889)**: Prometheus will scrape the otel-collector:8889 endpoint to collect metrics exposed by the otel-collector.  
   ![Prometheus Scrape](images/Prometheus-Scrape-Config.png)
-  <center><em>Configuring the scrape in prometheus-config.yml.</em></center><br><br>
+  *Configuring the scrape in prometheus-config.yml*
 
   > [!IMPORTANT]
   > Support for exemplars is enabled, so that prometheus can capture and store exemplars, connecting metrics and traces to improve the observability and debugging of the system.
   ![Prometheus Docker](images/Prometheus-Docker-Config.png)
-  <center><em>Configuring enable-feature=exemplar-storage in docker-compose.yml.</em></center><br>
+  *Configuring enable-feature=exemplar-storage in docker-compose.yml*
 
   ### <u>grafana</u>
   ![Grafana](images/Grafana.png)  
@@ -132,21 +132,21 @@ The components used in this implementation are detailed below.
   **prometheus datasources**: Grafana queries and displays metrics stored in prometheus through the endpoint http://prometheus:9090.  
   **exemplarTraceIdDestinations(exemplars)** is configured, which will allow associating a trace_id with jaeger. This enables a correlation between metrics and traces, providing complete traceability.  
   ![Grafana Prometheus DataSources](images/Grafana-Prometheus-DataSources.png)
-  <center><em>Configuring prometheus datasoruces in grafana-datasources-config.yml.</em></center><br><br>
+  *Configuring prometheus datasoruces in grafana-datasources-config.yml*
 
   **jaeger datasources**: Grafana queries and displays traces stored in jaeger through the endpoint http://jaeger:16686. **tracesToLogs** is configured to correlate jaeger traces with loki logs. This will allow a click on the trace to view the associated logs. Also configured **nodeGraph**, which allows grafana to visualize a graph of dependencies between microservices or components based on jaeger traces.  
   ![Grafana Jaeger DataSources](images/Grafana-Jaeger-DataSources.png)
-  <center><em>Configuring jaeger datasoruces in grafana-datasources-config.yml.</em></center><br><br>
+  *Configuring jaeger datasoruces in grafana-datasources-config.yml*
 
   **loki datasources**: Grafana queries and displays the logs stored in loki through the endpoint http://loki:3100. **derivedFields** is configured where the derived field TraceID is defined, which extracts the traceid from the logs recorded in loki and links them to the traces generated by jaeger. This allows navigating from logs to traces for further analysis.  
   ![Grafana Loki DataSources](images/Grafana-Loki-DataSources.png)
-  <center><em>Configuring loki datasoruces in grafana-datasources-config.yml.</em></center><br><br>
+  *Configuring loki datasoruces in grafana-datasources-config.yml*
 
   In the dashboards.yml file, a provider is configured to load dashboards stored in json files, located in the /etc/grafana/provisioning/dashboards path. This allows the example dashboard(dashboard-grafana.json) to be loaded and then displayed in the grafana portal.
 
   ![Grafana Dashboard Config](images/Grafana-Dashboard-Config.png)
   ![Grafana Dashboard Json](images/Grafana-Dashboard-Json.png)
-  <center><em>Configuring provider in dashboards.yml.</em></center><br><br>
+  *Configuring provider in dashboards.yml*
 
 
 ## Running the application
